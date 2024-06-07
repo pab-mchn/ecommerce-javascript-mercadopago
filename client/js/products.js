@@ -1,23 +1,23 @@
 const productos = [
   {
     id: 1,
-    productName: "Let it be",
+    productName: "Sandia",
     price: 10,
     quanty: 1,
-    img: "https://upload.wikimedia.org/wikipedia/en/2/25/LetItBe.jpg",
+    img: "./media/sandia1.png",
   },
   {
     id: 2,
-    productName: "Sticky Fingers",
+    productName: "Bananita",
     price: 20,
     quanty: 1,
-    img: "https://upload.wikimedia.org/wikipedia/en/5/57/The_Rolling_Stones_-_Sticky_Fingers.png",
+    img: "./media/bananita1.png",
   },
   {
     id: 3,
-    productName: "Ramones",
+    productName: "Cervecita",
     price: 30,
     quanty: 1,
-    img: "https://upload.wikimedia.org/wikipedia/en/b/bb/Ramones_-_Ramones_cover.jpg",
+    img: "./media/cervecita1.png",
   },
 ];

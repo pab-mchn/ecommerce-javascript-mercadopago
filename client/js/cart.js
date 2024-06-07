@@ -83,69 +83,60 @@ const displayCart = () => {
     modalFooter.className = "modal-footer";
     modalFooter.innerHTML = `
     <div class="total-price">Total: ${total} $</div>
-    <!--here out the necesary mercado pago html-->
     <button class="btn-primary" id="checkout-btn"> go to checkout</button>  
-    <div id="button-checkout"></div>
+    <div id="wallet_container"></div>
     `;
     modalContainer.append(modalFooter);
 
-    // mp;
-    const mercadopago = new MercadoPago("public_key", {
-      locale: "es-AR", // The most common are: 'pt-BR', 'es-AR' and 'en-US'
+    //mp
+    const mp = new MercadoPago("APP_USR-6e8b7479-99c7-4563-b856-4b5c3424b35d", {
+      locale: "es-AR",
     });
 
-    const checkoutButton = modalFooter.querySelector("#checkout-btn");
+    //funcion que genera un titlo con al info del carrito
+    const generateCartDescription = () => {
+      return cart.map(product => `${product.productName} (x${product.quanty})`).join(', ');
+    };
 
-    checkoutButton.addEventListener("click", function () {
-      checkoutButton.remove();
+    document.getElementById("checkout-btn").addEventListener("click", async () => {
+      try {
+        const orderData = {
+          title: generateCartDescription(),
+          quantity: 1,
+          price: total,
+        };
 
-      const orderData = {
-        quantity: 1,
-        description: "compra de ecommerce",
-        price: total,
-      };
-
-      fetch("http://localhost:8080/create_preference", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderData),
-      })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (preference) {
-          createCheckoutButton(preference.id);
-        })
-        .catch(function () {
-          alert("Unexpected error");
+        const response = await fetch("http://localhost:3000/create_preference", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(orderData),
         });
+
+        const preference = await response.json();
+        createCheckoutButton(preference.id);
+      } catch (error) {
+        alert("error :(");
+      }
     });
 
-    function createCheckoutButton(preferenceId) {
-      // Initialize the checkout
-      const bricksBuilder = mercadopago.bricks();
+    const createCheckoutButton = (preferenceId) => {
+      const bricksBuilder = mp.bricks();
 
-      const renderComponent = async (bricksBuilder) => {
-        //if (window.checkoutButton) checkoutButton.unmount();
+      const renderComponent = async () => {
+        if (window.checkoutButton) window.checkoutButton.unmount();
 
-        await bricksBuilder.create(
-          "wallet",
-          "button-checkout", // class/id where the payment button will be displayed
-          {
-            initialization: {
-              preferenceId: preferenceId,
-            },
-            callbacks: {
-              onError: (error) => console.error(error),
-              onReady: () => {},
-            },
-          }
-        );
+        await bricksBuilder.create("wallet", "wallet_container", {
+          initialization: {
+            preferenceId: preferenceId,
+          },
+        });
       };
-      window.checkoutButton = renderComponent(bricksBuilder);
-    }
+
+      renderComponent();
+    };
+
   } else {
     const modalText = document.createElement("h2");
     modalText.className = "modal-body";
